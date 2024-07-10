@@ -36,14 +36,17 @@ def random_state(width, height):
 RESET_COLOR = "\033[0m"
 ALIVE_COLOR = "\033[92m"  # Green for alive cells
 DIED_COLOR = "\033[90m"   # Grey for dead cells
+RED_COLOR = "\033[91m"
 def render(states):
   clear()
+  alive_count = 0
   top_border = "+" + "-" * len(states[0]) + "+"
   print(top_border)
   for row in states:
       var_char = "|"
       for item in row:
           if item:
+              alive_count += 1
               var_char += ALIVE_COLOR + "#" + RESET_COLOR
           else:
               var_char += DIED_COLOR + "." + RESET_COLOR
@@ -51,6 +54,7 @@ def render(states):
       print(var_char)
   bottom_border = "+" + "-" * len(states[0]) + "+"
   print(bottom_border)
+  print(f"{RED_COLOR}alive count: {alive_count}{RESET_COLOR}\n")
 
 def next_board_state(init_state):
     lines = len(init_state)
