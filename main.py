@@ -7,7 +7,7 @@
 '''
 
 # here put the import lib
-import random, os, time
+import random, os, time, argparse
 from functools import reduce
 
 
@@ -15,6 +15,7 @@ ALIVE = 1
 DIED = 0
 ROW_CHARS = "-"
 LINE_CHARS = "|"
+MAX_TIME = 5.0
 
 def row_state(width, ranint=False):
     if ranint:
@@ -32,20 +33,24 @@ def random_state(width, height):
     states = [row_state(width, ranint=True) for _ in range(height)]
     return states
 
+RESET_COLOR = "\033[0m"
+ALIVE_COLOR = "\033[92m"  # Green for alive cells
+DIED_COLOR = "\033[90m"   # Grey for dead cells
 def render(states):
-    for index, row in enumerate(states):
-        if index == 0:
-            print ((len(row) * ROW_CHARS) + 2 * ROW_CHARS)
-        var_char = LINE_CHARS
-        for item in row:
-            if item:
-                var_char += "#"
-            else:
-                var_char += " "
-        var_char += LINE_CHARS
-        print (f"{var_char}")
-        if index == len(states) - 1:
-            print ((len(row) * ROW_CHARS) + 2 * ROW_CHARS)
+  clear()
+  top_border = "+" + "-" * len(states[0]) + "+"
+  print(top_border)
+  for row in states:
+      var_char = "|"
+      for item in row:
+          if item:
+              var_char += ALIVE_COLOR + "#" + RESET_COLOR
+          else:
+              var_char += DIED_COLOR + "." + RESET_COLOR
+      var_char += "|"
+      print(var_char)
+  bottom_border = "+" + "-" * len(states[0]) + "+"
+  print(bottom_border)
 
 def next_board_state(init_state):
     lines = len(init_state)
@@ -87,16 +92,60 @@ def load_board_state(file):
         return init_states
 
 def clear():
-    if os.name == 'nt':
-        _ = os.system('cls')
-    else:
-        _ = os.system('clear')
+    os.system('clear' if os.name == 'posix' else 'cls')
+
+def print_arguments():
+    parser = argparse.ArgumentParser(
+        prog="Console Game Life",
+        description="A console implementation of Conway's Game of Life.",
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+    parser.add_argument(
+        "-f",
+        "--file",
+        help="Path to a file containing the initial state as lines of '0' and '1'."
+    )
+    parser.add_argument(
+        "-r",
+        "--random",
+        nargs=2,
+        metavar=('rows', 'cols'),
+        type=int,
+        help="Generate a random 2D array with specified dimensions (rows and cols)."
+    )
+    parser.add_argument(
+        "-t",
+        "--time",
+        type=float,
+        default=0.5,
+        help="Time interval between each iteration in seconds (default is 0.5 second)."
+    )
+    args = parser.parse_args()
+    if args.file and args.random:
+        parser.error("Arguments -f/--file and -r/--random cannot be used together.")
+    if args.time > MAX_TIME:
+        parser.error(f"The time interval cannot exceed {MAX_TIME} seconds.")
+    return args
 
 if __name__ == '__main__':
-    init_states = load_board_state("./toad.txt")
-    while True:
-        new_state = next_board_state(init_states)
-        render(new_state)
-        init_states = new_state
-        time.sleep(0.5)
-        os.system('clear' if os.name == 'posix' else 'cls')
+    args = print_arguments()
+    init_states = []
+    if args.file:
+        try:
+            init_states = load_board_state(args.file)
+        except ValueError as e:
+            raise e
+    elif args.random:
+        rows, cols = args.random
+        init_states = random_state(rows, cols)
+    else:
+        args = print_arguments()
+
+    try:
+      while True:
+          new_state = next_board_state(init_states)
+          render(new_state)
+          init_states = new_state
+          time.sleep(args.time)
+    except KeyboardInterrupt:
+      print ("\nExiting console game life.")
