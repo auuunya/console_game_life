@@ -125,6 +125,8 @@ def print_arguments():
         parser.error("Arguments -f/--file and -r/--random cannot be used together.")
     if args.time > MAX_TIME:
         parser.error(f"The time interval cannot exceed {MAX_TIME} seconds.")
+    if args.time < 0:
+        args.time = 0.5
     return args
 
 if __name__ == '__main__':
