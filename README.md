@@ -9,4 +9,4 @@ python main.py -r 100 30 -t 0.5
 ```
 
 #### Example:
-[![asciicast](https://asciinema.org/a/HWxWRTqefrfYwavng5InbFoFM.svg)](https://asciinema.org/a/HWxWRTqefrfYwavng5InbFoFM)
+[![asciicast](https://asciinema.org/a/iFFMWNFzLa0YHRRrKBp6ArwBF.svg)](https://asciinema.org/a/iFFMWNFzLa0YHRRrKBp6ArwBF)

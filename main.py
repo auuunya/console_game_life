@@ -56,25 +56,6 @@ def render(states):
   print(bottom_border)
   print(f"{RED_COLOR}alive count: {alive_count}{RESET_COLOR}\n")
 
-def render_str(states):
-  alive_count = 0
-  render_content = ""
-  top_border = "+" + "-" * len(states[0]) + "+\n"
-  render_content += render_content
-  for row in states:
-      var_char = "|"
-      for item in row:
-          if item:
-              alive_count += 1
-              var_char += ALIVE_COLOR + "#" + RESET_COLOR
-          else:
-              var_char += DIED_COLOR + "." + RESET_COLOR
-      var_char += "|"
-      render_content = render_content + var_char + "\n"
-  bottom_border = "+" + "-" * len(states[0]) + "+\n"
-  render_content += bottom_border
-  return render_content, alive_count
-
 def next_board_state(init_state):
     lines = len(init_state)
     rows = len(init_state[0])
@@ -90,7 +71,6 @@ def next_board_state(init_state):
             else:
                 new_state[line][row] = DIED
     return new_state
-
 
 def around_martix(y, x, rows, lines):
     total_list = []
@@ -157,6 +137,7 @@ help_messages = [
     "Press 'Q' or 'q' to quit."
 ]
 def draw_render(win, states):
+    win.erase()
     alive_count = 0
     moveY = 0
     maxHeight, maxWidth = win.getmaxyx()
@@ -166,7 +147,6 @@ def draw_render(win, states):
         states = random_state(maxWidth, cols)
     if cols + 4 > maxHeight:
         states = random_state(rows, maxHeight)
-
     for help_message in help_messages:
         win.addstr(moveY, 0, help_message)
         moveY += 1
@@ -176,7 +156,6 @@ def draw_render(win, states):
     win.addstr(moveY, 0, top_border)
     win.attroff(curses.color_pair(1))
     for row in states:
-        var_char = "|"
         moveX = 1
         moveY += 1
         win.attron(curses.color_pair(1))
@@ -185,18 +164,14 @@ def draw_render(win, states):
         for item in row:
             moveX += 1
             if item:
-                alive_count += 1
-                var_char += "#" 
                 win.attron(curses.color_pair(2))
                 win.addstr(moveY, moveX, "#")
                 win.attroff(curses.color_pair(2))
+                alive_count += 1
             else:
-                var_char += "."
                 win.attron(curses.color_pair(1))
                 win.addstr(moveY, moveX, ".")
                 win.attroff(curses.color_pair(1))
-        var_char += "|"
-        
         win.attron(curses.color_pair(1))
         win.addstr(moveY, len(row) + 1, "|")
         win.attroff(curses.color_pair(1))
